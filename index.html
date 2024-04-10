@@ -4,6 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Распознавание речи</title>
+<style>
+    #statusIndicator {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background-color: red;
+        display: inline-block;
+        margin-right: 10px;
+    }
+</style>
 <script>
 window.onload = function() {
     var recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition || window.mozSpeechRecognition || window.msSpeechRecognition)();
@@ -12,6 +22,7 @@ window.onload = function() {
     recognition.maxAlternatives = 1;
 
     var resultDisplay = document.getElementById('speechResult');
+    var statusIndicator = document.getElementById('statusIndicator');
 
     recognition.onresult = function(event) {
         var speechResult = event.results[0][0].transcript;
@@ -33,13 +44,20 @@ window.onload = function() {
         var encodedText = encodeURIComponent(text);
         var url = 'https://cors-anywhere-j2ux.onrender.com/https://busy-lime-betta-suit.cyclic.app/gpt/' + encodedText;
 
+        // Изменяем цвет квадратика на зеленый при отправке запроса
+        statusIndicator.style.backgroundColor = 'green';
+
         fetch(url)
         .then(response => response.text())
         .then(data => {
             displayResponse(data);
+            // Изменяем цвет квадратика на желтый при получении ответа
+            statusIndicator.style.backgroundColor = 'yellow';
         })
         .catch(error => {
             console.error('Error fetching data:', error);
+            // Изменяем цвет квадратика на красный при ошибке
+            statusIndicator.style.backgroundColor = 'red';
         });
     }
 
@@ -51,9 +69,8 @@ window.onload = function() {
 </script>
 </head>
 <body>
-<h1>Распознавание речи</h1>
-<p>Распознанная речь: <span id="speechResult"></span></p>
-<p>Ответ:</p>
+<div id="statusIndicator"></div>
+<p><span id="speechResult"></span></p>
 <p id="response"></p>
 </body>
 </html>
