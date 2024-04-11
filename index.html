@@ -109,7 +109,7 @@ recognition.onerror = function(event) {
         console.log('Error count:', errorCount); // Логируем количество ошибок
         if (errorCount >= 3) { // Проверяем, достиг ли счетчик значения 3
             statusIndicator.style.backgroundColor = 'red';
-            startFadeOutWithDelay(); // Запускаем fade-out с задержкой только если тип ошибки no-speech и счетчик ошибок достиг значения 3
+            startFadeOut(); // Запускаем fade-out с задержкой только если тип ошибки no-speech и счетчик ошибок достиг значения 3
             errorCount = 0; // Сбрасываем счетчик ошибок после запуска fade-out
             // Изменяем цвет кружка на красный
             
@@ -198,6 +198,7 @@ recognition.onerror = function(event) {
         }, 1000); // Добавляем небольшую задержку перед обнулением содержимого, чтобы дать время для завершения анимации
         responseElement.classList.add('hidden'); // Добавляем класс для скрытия текста
         responseElement.classList.remove('fade-out'); // Удаляем класс анимации исчезновения
+        responseElement.textContent = '⠀';
     }
 });
 };
