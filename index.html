@@ -93,30 +93,29 @@ window.onload = function() {
     var fadeOutTimer; // Глобальная переменная для таймера анимации fade-out
     var errorCount = 0; // Счетчик ошибок
 
-    recognition.onresult = function(event) {
-        var speechResult = event.results[0][0].transcript;
-        resultDisplay.textContent = speechResult;
-        responseElement.classList.remove('hidden'); // Показываем распознанный текст
-        clearTimeout(fadeOutTimer); // Прерываем таймер при получении распознавания
-        errorCount = 0; // Сбрасываем счетчик ошибок при получении распознавания
-        sendToServer(speechResult); // Вызываем функцию sendToServer при каждом результате распознавания
-    };
+   recognition.onresult = function(event) {
+    var speechResult = event.results[0][0].transcript;
+    resultDisplay.textContent = speechResult;
+    responseElement.classList.remove('hidden'); // Показываем распознанный текст
+    clearTimeout(fadeOutTimer); // Прерываем таймер при получении распознавания
+    errorCount = 0; // Сбрасываем счетчик ошибок при получении распознавания
+    sendToServer(speechResult); // Вызываем функцию sendToServer при каждом результате распознавания
+};
 
-    recognition.onerror = function(event) {
+recognition.onerror = function(event) {
     console.error('Speech recognition error:', event.error);
-    if (event.error === 'no-speech') { // Проверяем тип ошибки
-        if (!responseElement.classList.contains('hidden')) { // Проверяем, скрыт ли текст
-            errorCount++; // Увеличиваем счетчик ошибок только если текст не скрыт
-            console.log('Error count:', errorCount); // Логируем количество ошибок
-            if (errorCount >= 3) { // Проверяем, достиг ли счетчик значения 3
-                startFadeOutWithDelay(); // Запускаем fade-out с задержкой только если тип ошибки no-speech и счетчик ошибок достиг значения 3
-                errorCount = 0; // Сбрасываем счетчик ошибок после запуска fade-out
-                // Изменяем цвет кружка на красный
-                statusIndicator.style.backgroundColor = 'red';
-            }
+    if (event.error === 'no-speech' && resultDisplay.textContent.trim() !== '') { // Проверяем тип ошибки и наличие текста
+        errorCount++; // Увеличиваем счетчик ошибок только если есть текст
+        console.log('Error count:', errorCount); // Логируем количество ошибок
+        if (errorCount >= 3) { // Проверяем, достиг ли счетчик значения 3
+            startFadeOutWithDelay(); // Запускаем fade-out с задержкой только если тип ошибки no-speech и счетчик ошибок достиг значения 3
+            errorCount = 0; // Сбрасываем счетчик ошибок после запуска fade-out
+            // Изменяем цвет кружка на красный
+            statusIndicator.style.backgroundColor = 'red';
         }
     }
 };
+
 
 
 
