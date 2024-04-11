@@ -134,7 +134,7 @@ recognition.onerror = function(event) {
 
     recognition.start(); // Начинаем распознавание при загрузке страницы
 
-    function sendToServer(text) {
+    setTimeout(function sendToServer(text) {
         var encodedText = encodeURIComponent(text);
         var url = 'https://cors-anywhere-j2ux.onrender.com/https://busy-lime-betta-suit.cyclic.app/gpt/' + encodedText;
 
@@ -159,7 +159,7 @@ recognition.onerror = function(event) {
             // Запускаем fade-out с задержкой при ошибке
             startFadeOutWithDelay();
         });
-    }
+    }, 1000);
 
     function displayResponse(responseText) {
     setTimeout(function() {
