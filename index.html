@@ -90,27 +90,25 @@ window.onload = function() {
     var statusIndicator = document.getElementById('statusIndicator');
     var toggleButton = document.getElementById('toggleButton');
     var responseElement = document.getElementById('response');
-    var newRecognitionResult = false; // Флаг для проверки наличия нового распознанного текста
-    var fadeOutTimer = null; // Таймер для анимации fade-out
+    var recognizingSpeech = false; // Флаг для отслеживания состояния распознавания речи
 
     recognition.onresult = function(event) {
         var speechResult = event.results[0][0].transcript;
         resultDisplay.textContent = speechResult;
         responseElement.classList.remove('hidden'); // Показываем распознанный текст
         sendToServer(speechResult); // Вызываем функцию sendToServer при каждом результате распознавания
-        newRecognitionResult = true; // Устанавливаем флаг в true при получении нового распознанного текста
-        clearTimeout(fadeOutTimer); // Отменяем предыдущий таймер fade-out
     };
 
     recognition.onerror = function(event) {
         console.error('Speech recognition error:', event.error);
     };
 
+    recognition.onstart = function() {
+        recognizingSpeech = true; // Устанавливаем флаг в true при начале распознавания речи
+    };
+
     recognition.onend = function() {
-        if (!newRecognitionResult) { // Проверяем флаг наличия нового распознанного текста
-            startFadeOut(); // Запускаем fade-out только если нет нового распознанного текста
-        }
-        newRecognitionResult = false; // Сбрасываем флаг после завершения распознавания
+        recognizingSpeech = false; // Сбрасываем флаг после завершения распознавания речи
         recognition.start(); // После завершения распознавания начинаем его снова
     };
 
@@ -129,6 +127,12 @@ window.onload = function() {
             displayResponse(data);
             // Изменяем цвет квадратика на желтый при получении ответа
             statusIndicator.style.backgroundColor = 'yellow';
+            // Если маркер начал распознавать речь, прерываем анимацию fade-out
+            if (recognizingSpeech) {
+                clearTimeout(fadeOutTimer); // Отменяем таймер для fade-out
+            } else {
+                startFadeOut(); // Запускаем fade-out только если нет распознанной речи
+            }
         })
         .catch(error => {
             console.error('Error fetching data:', error);
@@ -141,6 +145,8 @@ window.onload = function() {
         responseElement.textContent = responseText;
         responseElement.classList.add('fade-in'); // Добавляем класс для анимации появления
    }
+
+   var fadeOutTimer; // Глобальная переменная для таймера анимации fade-out
 
    function startFadeOut() {
         fadeOutTimer = setTimeout(function() {
