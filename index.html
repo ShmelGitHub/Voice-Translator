@@ -1,3 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Распознавание речи</title>
+<style>
+    body {
+        background-color: green; /* Изменен цвет фона страницы на зеленый */
+        color: white; /* Изменен цвет текста на белый */
+        text-align: center; /* Отцентрирован текст по центру */
+        font-size: 2em;
+        font-family: Arial, sans-serif;
+    }
+
+    #statusIndicator, #toggleButton {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        position: fixed; /* Переключение на фиксированное позиционирование */
+        outline: 1px solid rgba(128, 128, 128, 0.5); /* Изменен цвет и прозрачность outline */
+    }
+
+    #statusIndicator {
+        background-color: red;
+        top: 10px; /* Расположение в левом верхнем углу */
+        left: 10px; /* Расположение в левом верхнем углу */
+    }
+
+    #toggleButton {
+        background-color: gray; /* Изменен цвет фона кнопки на серый */
+        top: 10px; /* Расположение в левом верхнем углу */
+        left: 40px; /* Отступ от маркера */
+        cursor: pointer;
+    }
+
+    #response {
+        color: white; /* Изменен цвет текста на белый */
+        margin-top: 100px; /* Добавлен отступ сверху */
+        line-height: 1em; /* Установлено значение высоты строки */
+        height: calc(100vh - 170px); /* Высота блока с отступами сверху и снизу */
+        display: flex; /* Использование flexbox для центрирования содержимого */
+        justify-content: center; /* Выравнивание содержимого по центру по горизонтали */
+        align-items: center; /* Выравнивание содержимого по центру по вертикали */
+    }
+
+    #response.fade-in {
+        animation: fadeIn 1s ease-out forwards; /* Анимация появления с задержкой 1 секунда и плавным исчезновением */
+    }
+
+    #response.fade-out {
+        animation: fadeOut 1s ease-out forwards; /* Анимация исчезновения с задержкой 1 секунда и плавным исчезнованием */
+    }
+
+    #response.hidden {
+        display: none; /* Скрываем текст при добавлении класса hidden */
+    }
+
+    #speechResult {
+        font-size: 1em; /* Уменьшен размер текста в два раза */
+        display: none; /* Начально скрываем распознанный текст */
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0; /* Начальное значение прозрачности */
+        }
+        to {
+            opacity: 1; /* Конечное значение прозрачности */
+        }
+    }
+
+    @keyframes fadeOut {
+        from {
+            opacity: 1; /* Начальное значение прозрачности */
+        }
+        to {
+            opacity: 0; /* Конечное значение прозрачности */
+        }
+    }
+</style>
+<script>
 window.onload = function() {
     var recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition || window.mozSpeechRecognition || window.msSpeechRecognition)();
     recognition.lang = 'ru-RU';
@@ -9,6 +91,7 @@ window.onload = function() {
     var toggleButton = document.getElementById('toggleButton');
     var responseElement = document.getElementById('response');
     var fadeOutTimer; // Глобальная переменная для таймера анимации fade-out
+    var isFadingOut = false; // Флаг для отслеживания состояния fade-out
 
     recognition.onresult = function(event) {
         var speechResult = event.results[0][0].transcript;
@@ -21,7 +104,9 @@ window.onload = function() {
     recognition.onerror = function(event) {
         console.error('Speech recognition error:', event.error);
         if (event.error === 'no-speech') { // Проверяем тип ошибки
-            startFadeOutWithDelay(); // Запускаем fade-out с задержкой только если тип ошибки no-speech
+            if (!isFadingOut) { // Проверяем, было ли состояние fade-out активировано ранее
+                startFadeOutWithDelay(); // Запускаем fade-out с задержкой только если тип ошибки no-speech и состояние fade-out не было активировано ранее
+            }
         }
     };
 
@@ -47,9 +132,10 @@ window.onload = function() {
             displayResponse(data);
             // Изменяем цвет квадратика на желтый при получении ответа
             statusIndicator.style.backgroundColor = 'yellow';
-            // Если есть распознанный текст, отменяем таймер для fade-out
+            // Если есть распознанный текст, отменяем таймер для fade-out и сбрасываем флаг
             if (resultDisplay.textContent) {
                 clearTimeout(fadeOutTimer);
+                isFadingOut = false;
             }
         })
         .catch(error => {
@@ -72,14 +158,17 @@ window.onload = function() {
         fadeOutTimer = setTimeout(function() {
             responseElement.classList.add('fade-out'); // Добавляем класс для анимации исчезновения
             setTimeout(function() {
-                responseElement.style.display = 'none'; // Скрываем элемент
+                responseElement.classList.add('hidden'); // Добавляем класс для скрытия текста
                 responseElement.classList.remove('fade-out'); // Удаляем класс анимации исчезновения
             }, 1000); // Длительность анимации исчезновения
         }, 5000); // Длительность задержки перед скрытием текста
     }
 
     function startFadeOutWithDelay() {
-        setTimeout(startFadeOut, 500); // Задержка перед запуском fade-out
+        setTimeout(function() {
+            isFadingOut = true; // Устанавливаем флаг в true при запуске fade-out с задержкой
+            startFadeOut();
+        }, 500);
     }
 
     // Функция для переключения видимости распознанного текста
@@ -91,12 +180,21 @@ window.onload = function() {
         }
     };
 
-    // Удаление стиля display: none; после завершения анимации fade-out
+    // Удаление класса hidden после завершения анимации fade out
     responseElement.addEventListener('animationend', function(event) {
         if (event.animationName === 'fadeOut') {
             responseElement.textContent = ''; // Обнуляем содержимое элемента
-            responseElement.style.display = 'none'; // Скрываем элемент
+            responseElement.classList.add('hidden'); // Добавляем класс для скрытия текста
             responseElement.classList.remove('fade-out'); // Удаляем класс анимации исчезновения
         }
     });
 };
+</script>
+</head>
+<body>
+<div id="statusIndicator"></div>
+<button id="toggleButton"></button>
+<p id="response" class="hidden"></p>
+<p><span id="speechResult"></span></p>
+</body>
+</html>
