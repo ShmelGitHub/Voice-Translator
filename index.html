@@ -96,13 +96,14 @@ window.onload = function() {
         var speechResult = event.results[0][0].transcript;
         resultDisplay.textContent = speechResult;
         responseElement.classList.remove('hidden'); // Показываем распознанный текст
+        clearTimeout(fadeOutTimer); // Прерываем таймер при получении распознавания
         sendToServer(speechResult); // Вызываем функцию sendToServer при каждом результате распознавания
     };
 
     recognition.onerror = function(event) {
         console.error('Speech recognition error:', event.error);
         if (event.error === 'no-speech') { // Проверяем тип ошибки
-            startFadeOut(); // Запускаем fade-out только если тип ошибки no-speech
+            startFadeOutWithDelay(); // Запускаем fade-out с задержкой только если тип ошибки no-speech
         }
     };
 
@@ -137,17 +138,19 @@ window.onload = function() {
             console.error('Error fetching data:', error);
             // Изменяем цвет квадратика на красный при ошибке
             statusIndicator.style.backgroundColor = 'red';
+            // Запускаем fade-out с задержкой при ошибке
+            startFadeOutWithDelay();
         });
     }
 
-   function displayResponse(responseText) {
-    setTimeout(function() {
-        responseElement.textContent = responseText;
-        responseElement.classList.add('fade-in'); // Добавляем класс для анимации появления
-    }, 100); // Задержка перед сменой текста в миллисекундах
-}
+    function displayResponse(responseText) {
+        setTimeout(function() {
+            responseElement.textContent = responseText;
+            responseElement.classList.add('fade-in'); // Добавляем класс для анимации появления
+        }, 100); // Задержка перед сменой текста в миллисекундах
+    }
 
-   function startFadeOut() {
+    function startFadeOut() {
         fadeOutTimer = setTimeout(function() {
             responseElement.classList.add('fade-out'); // Добавляем класс для анимации исчезновения
             setTimeout(function() {
@@ -155,6 +158,10 @@ window.onload = function() {
                 responseElement.classList.remove('fade-out'); // Удаляем класс анимации исчезновения
             }, 1000); // Длительность анимации исчезновения
         }, 5000); // Длительность задержки перед скрытием текста
+    }
+
+    function startFadeOutWithDelay() {
+        setTimeout(startFadeOut, 500); // Задержка перед запуском fade-out
     }
 
     // Функция для переключения видимости распознанного текста
@@ -168,12 +175,12 @@ window.onload = function() {
 
     // Удаление класса hidden после завершения анимации fade out
     responseElement.addEventListener('animationend', function(event) {
-    if (event.animationName === 'fadeOut') {
-        responseElement.textContent = ''; // Обнуляем содержимое элемента
-        responseElement.classList.add('hidden'); // Добавляем класс для скрытия текста
-        responseElement.classList.remove('fade-out'); // Удаляем класс анимации исчезновения
-    }
-});
+        if (event.animationName === 'fadeOut') {
+            responseElement.textContent = ''; // Обнуляем содержимое элемента
+            responseElement.classList.add('hidden'); // Добавляем класс для скрытия текста
+            responseElement.classList.remove('fade-out'); // Удаляем класс анимации исчезновения
+        }
+    });
 };
 </script>
 </head>
