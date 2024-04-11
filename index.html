@@ -134,7 +134,7 @@ recognition.onerror = function(event) {
 
     recognition.start(); // Начинаем распознавание при загрузке страницы
 
-    setTimeout(function sendToServer(text) {
+    function sendToServer(text) {
         var encodedText = encodeURIComponent(text);
         var url = 'https://cors-anywhere-j2ux.onrender.com/https://busy-lime-betta-suit.cyclic.app/gpt/' + encodedText;
 
@@ -159,7 +159,7 @@ recognition.onerror = function(event) {
             // Запускаем fade-out с задержкой при ошибке
             startFadeOutWithDelay();
         });
-    }, 10000);
+    }
 
     function displayResponse(responseText) {
     setTimeout(function() {
@@ -215,5 +215,5 @@ recognition.onerror = function(event) {
 <button id="toggleButton"></button>
 <p id="response" class="hidden"></p>
 <p><span id="speechResult"></span></p>
-<p style="position: fixed; bottom: 10px; left: 10px; font-size: 0.4em;font-family: Arial, sans-serif;">0.1.7</p> <!-- Текст с версией сайта -->
+<p style="position: fixed; bottom: 10px; left: 10px; font-size: 0.4em;font-family: Arial, sans-serif;">0.1.6</p> <!-- Текст с версией сайта -->
 </body>
