@@ -150,11 +150,15 @@ window.onload = function() {
     }
 
     function displayResponse(responseText) {
-        setTimeout(function() {
-            responseElement.textContent = responseText;
-            responseElement.classList.add('fade-in'); // Добавляем класс для анимации появления
-        }, 100); // Задержка перед сменой текста в миллисекундах
-    }
+    setTimeout(function() {
+        responseElement.textContent = responseText;
+        if (responseElement.classList.contains('hidden')) {
+            responseElement.classList.remove('hidden');
+            responseElement.classList.add('fade-in');
+        }
+    }, 100); // Задержка перед сменой текста в миллисекундах
+}
+
 
     function startFadeOut() {
         fadeOutTimer = setTimeout(function() {
