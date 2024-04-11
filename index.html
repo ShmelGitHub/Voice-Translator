@@ -93,8 +93,13 @@ window.onload = function() {
     var fadeOutTimer; // Глобальная переменная для таймера анимации fade-out
     var errorCount = 0; // Счетчик ошибок
 
-   recognition.onresult = function(event) {
+recognition.onstart = function() {
+    // Изменяем цвет квадратика на синий при начале распознавания
     statusIndicator.style.backgroundColor = 'blue';
+};
+
+
+   recognition.onresult = function(event) {
     var speechResult = event.results[0][0].transcript;
     resultDisplay.textContent = speechResult;
     responseElement.classList.remove('hidden'); // Показываем распознанный текст
@@ -210,5 +215,5 @@ recognition.onerror = function(event) {
 <button id="toggleButton"></button>
 <p id="response" class="hidden"></p>
 <p><span id="speechResult"></span></p>
-<p style="position: fixed; bottom: 10px; left: 10px; font-size: 0.4em;font-family: Arial, sans-serif;">0.1.1</p> <!-- Текст с версией сайта -->
+<p style="position: fixed; bottom: 10px; left: 10px; font-size: 0.4em;font-family: Arial, sans-serif;">0.1.2</p> <!-- Текст с версией сайта -->
 </body>
