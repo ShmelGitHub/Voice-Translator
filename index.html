@@ -18,7 +18,7 @@
         height: 20px;
         border-radius: 50%;
         position: fixed; /* Переключение на фиксированное позиционирование */
-        outline: 1px solid rgba(128, 128, 128, 0.5); /* Изменен цвет и прозрачность outline */
+        outline: 2px solid rgba(128, 128, 128, 0.5); /* Изменен цвет и прозрачность outline */
     }
 
     #statusIndicator {
@@ -94,6 +94,7 @@ window.onload = function() {
     var errorCount = 0; // Счетчик ошибок
 
    recognition.onresult = function(event) {
+    statusIndicator.style.backgroundColor = 'blue';
     var speechResult = event.results[0][0].transcript;
     resultDisplay.textContent = speechResult;
     responseElement.classList.remove('hidden'); // Показываем распознанный текст
@@ -134,7 +135,7 @@ recognition.onerror = function(event) {
         var url = 'https://cors-anywhere-j2ux.onrender.com/https://busy-lime-betta-suit.cyclic.app/gpt/' + encodedText;
 
         // Изменяем цвет квадратика на зеленый при отправке запроса
-        statusIndicator.style.backgroundColor = 'green';
+        statusIndicator.style.backgroundColor = 'orange';
 
         fetch(url)
         .then(response => response.text())
