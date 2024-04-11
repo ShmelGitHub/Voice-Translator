@@ -132,13 +132,13 @@ window.onload = function() {
         fetch(url)
         .then(response => response.text())
         .then(data => {
-            displayResponse(data);
             // Изменяем цвет квадратика на желтый при получении ответа
             statusIndicator.style.backgroundColor = 'yellow';
             // Если есть распознанный текст, отменяем таймер для fade-out
             if (resultDisplay.textContent) {
                 clearTimeout(fadeOutTimer);
             }
+            displayResponse(data); // Показываем ответ после получения
         })
         .catch(error => {
             console.error('Error fetching data:', error);
