@@ -91,6 +91,7 @@ window.onload = function() {
     var toggleButton = document.getElementById('toggleButton');
     var responseElement = document.getElementById('response');
     var newRecognitionResult = false; // Флаг для проверки наличия нового распознанного текста
+    var fadeOutTimer = null; // Таймер для анимации fade-out
 
     recognition.onresult = function(event) {
         var speechResult = event.results[0][0].transcript;
@@ -98,6 +99,7 @@ window.onload = function() {
         responseElement.classList.remove('hidden'); // Показываем распознанный текст
         sendToServer(speechResult); // Вызываем функцию sendToServer при каждом результате распознавания
         newRecognitionResult = true; // Устанавливаем флаг в true при получении нового распознанного текста
+        clearTimeout(fadeOutTimer); // Отменяем предыдущий таймер fade-out
     };
 
     recognition.onerror = function(event) {
@@ -141,7 +143,7 @@ window.onload = function() {
    }
 
    function startFadeOut() {
-        setTimeout(function() {
+        fadeOutTimer = setTimeout(function() {
             responseElement.classList.add('fade-out'); // Добавляем класс для анимации исчезновения
             setTimeout(function() {
                 responseElement.classList.add('hidden'); // Добавляем класс для скрытия текста
