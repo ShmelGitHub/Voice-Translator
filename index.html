@@ -104,8 +104,8 @@ window.onload = function() {
 
 recognition.onerror = function(event) {
     console.error('Speech recognition error:', event.error);
-    if (event.error === 'no-speech' && responseElement.style.display !== 'none') { // Проверяем тип ошибки и видимость элемента responseElement
-        errorCount++; // Увеличиваем счетчик ошибок только если текст видим
+    if (event.error === 'no-speech' && statusIndicator.style.backgroundColor !== 'red') { // Проверяем тип ошибки и цвет кружка
+        errorCount++; // Увеличиваем счетчик ошибок только если кружок не красный
         console.log('Error count:', errorCount); // Логируем количество ошибок
         if (errorCount >= 3) { // Проверяем, достиг ли счетчик значения 3
             startFadeOutWithDelay(); // Запускаем fade-out с задержкой только если тип ошибки no-speech и счетчик ошибок достиг значения 3
