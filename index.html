@@ -90,12 +90,14 @@ window.onload = function() {
     var statusIndicator = document.getElementById('statusIndicator');
     var toggleButton = document.getElementById('toggleButton');
     var responseElement = document.getElementById('response');
+    var newRecognitionResult = false; // Флаг для проверки наличия нового распознанного текста
 
     recognition.onresult = function(event) {
         var speechResult = event.results[0][0].transcript;
         resultDisplay.textContent = speechResult;
         responseElement.classList.remove('hidden'); // Показываем распознанный текст
         sendToServer(speechResult); // Вызываем функцию sendToServer при каждом результате распознавания
+        newRecognitionResult = true; // Устанавливаем флаг в true при получении нового распознанного текста
     };
 
     recognition.onerror = function(event) {
@@ -103,6 +105,10 @@ window.onload = function() {
     };
 
     recognition.onend = function() {
+        if (!newRecognitionResult) { // Проверяем флаг наличия нового распознанного текста
+            startFadeOut(); // Запускаем fade-out только если нет нового распознанного текста
+        }
+        newRecognitionResult = false; // Сбрасываем флаг после завершения распознавания
         recognition.start(); // После завершения распознавания начинаем его снова
     };
 
@@ -121,15 +127,6 @@ window.onload = function() {
             displayResponse(data);
             // Изменяем цвет квадратика на желтый при получении ответа
             statusIndicator.style.backgroundColor = 'yellow';
-            // Запускаем таймер для скрытия распознанного текста через 5 секунд
-            setTimeout(function() {
-                responseElement.classList.add('fade-out'); // Добавляем класс для анимации исчезновения
-                setTimeout(function() {
-                    responseElement.classList.add('hidden'); // Добавляем класс для скрытия текста
-                    responseElement.classList.remove('fade-out'); // Удаляем класс анимации исчезновения
-                    responseElement.textContent = ''; // Обнуляем содержимое элемента
-                }, 1000); // Длительность анимации исчезновения
-            }, 5000); // Длительность задержки перед скрытием текста
         })
         .catch(error => {
             console.error('Error fetching data:', error);
@@ -139,11 +136,20 @@ window.onload = function() {
     }
 
    function displayResponse(responseText) {
-    setTimeout(function() {
         responseElement.textContent = responseText;
         responseElement.classList.add('fade-in'); // Добавляем класс для анимации появления
-    }, 100); // Задержка перед сменой текста в миллисекундах
-}
+   }
+
+   function startFadeOut() {
+        setTimeout(function() {
+            responseElement.classList.add('fade-out'); // Добавляем класс для анимации исчезновения
+            setTimeout(function() {
+                responseElement.classList.add('hidden'); // Добавляем класс для скрытия текста
+                responseElement.classList.remove('fade-out'); // Удаляем класс анимации исчезновения
+                responseElement.textContent = ''; // Обнуляем содержимое элемента
+            }, 1000); // Длительность анимации исчезновения
+        }, 5000); // Длительность задержки перед скрытием текста
+    }
 
     // Функция для переключения видимости распознанного текста
     toggleButton.onclick = function() {
