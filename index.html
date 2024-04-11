@@ -108,10 +108,11 @@ recognition.onerror = function(event) {
         errorCount++; // Увеличиваем счетчик ошибок только если кружок не красный
         console.log('Error count:', errorCount); // Логируем количество ошибок
         if (errorCount >= 3) { // Проверяем, достиг ли счетчик значения 3
+            statusIndicator.style.backgroundColor = 'red';
             startFadeOutWithDelay(); // Запускаем fade-out с задержкой только если тип ошибки no-speech и счетчик ошибок достиг значения 3
             errorCount = 0; // Сбрасываем счетчик ошибок после запуска fade-out
             // Изменяем цвет кружка на красный
-            statusIndicator.style.backgroundColor = 'red';
+            
         }
     }
 };
