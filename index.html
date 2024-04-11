@@ -104,18 +104,18 @@ window.onload = function() {
 
     recognition.onerror = function(event) {
     console.error('Speech recognition error:', event.error);
-    if (event.error === 'no-speech') { // Проверяем тип ошибки
-        errorCount++; // Увеличиваем счетчик ошибок
-        console.log('Error count:', errorCount); // Логируем количество ошибок
-        if (errorCount >= 3) { // Проверяем, достиг ли счетчик значения 3
-            startFadeOutWithDelay(); // Запускаем fade-out с задержкой только если тип ошибки no-speech и счетчик ошибок достиг значения 3
-            errorCount = 0; // Сбрасываем счетчик ошибок после запуска fade-out
-            // Изменяем цвет кружка на красный
-            statusIndicator.style.backgroundColor = 'red';
+    if (event.error === 'no-speech') {
+        if (resultDisplay.textContent) {
+            errorCount++; // Увеличиваем счетчик ошибок только если есть распознанный текст
+            console.log('Error count:', errorCount); // Логируем количество ошибок
+            if (errorCount >= 3) {
+                startFadeOutWithDelay();
+                errorCount = 0;
+                statusIndicator.style.backgroundColor = 'red';
+            }
         }
     }
 };
-
 
     recognition.onend = function() {
         if (!resultDisplay.textContent) { // Проверяем наличие текста в speechResult
