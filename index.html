@@ -190,7 +190,7 @@ recognition.onerror = function(event) {
     };
 
     // Удаление класса hidden после завершения анимации fade out
-   responseElement.addEventListener('animationend', function(event) {
+responseElement.addEventListener('animationend', function(event) {
     if (event.animationName === 'fadeOut') {
         setTimeout(function() {
             responseElement.textContent = ''; // Обнуляем содержимое элемента
@@ -198,6 +198,8 @@ recognition.onerror = function(event) {
         responseElement.classList.add('hidden'); // Добавляем класс для скрытия текста
         responseElement.classList.remove('fade-out'); // Удаляем класс анимации исчезновения
     }
+    // Обнуляем содержимое элемента в любом случае, когда анимация исчезновения завершается
+    responseElement.textContent = '';
 });
 };
 </script>
