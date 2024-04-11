@@ -127,6 +127,7 @@ window.onload = function() {
                 setTimeout(function() {
                     responseElement.classList.add('hidden'); // Добавляем класс для скрытия текста
                     responseElement.classList.remove('fade-out'); // Удаляем класс анимации исчезновения
+                    responseElement.textContent = ''; // Обнуляем содержимое элемента
                 }, 1000); // Длительность анимации исчезновения
             }, 5000); // Длительность задержки перед скрытием текста
         })
