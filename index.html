@@ -91,7 +91,7 @@ window.onload = function() {
     var toggleButton = document.getElementById('toggleButton');
     var responseElement = document.getElementById('response');
     var fadeOutTimer; // Глобальная переменная для таймера анимации fade-out
-    var isFadingOut = false; // Флаг для отслеживания состояния fade-out
+    var errorCount = 0; // Счетчик ошибок
 
     recognition.onresult = function(event) {
         var speechResult = event.results[0][0].transcript;
@@ -104,8 +104,10 @@ window.onload = function() {
     recognition.onerror = function(event) {
         console.error('Speech recognition error:', event.error);
         if (event.error === 'no-speech') { // Проверяем тип ошибки
-            if (!isFadingOut) { // Проверяем, было ли состояние fade-out активировано ранее
-                startFadeOutWithDelay(); // Запускаем fade-out с задержкой только если тип ошибки no-speech и состояние fade-out не было активировано ранее
+            errorCount++; // Увеличиваем счетчик ошибок
+            if (errorCount >= 3) { // Проверяем, достиг ли счетчик значения 3
+                startFadeOutWithDelay(); // Запускаем fade-out с задержкой только если тип ошибки no-speech и счетчик ошибок достиг значения 3
+                errorCount = 0; // Сбрасываем счетчик ошибок после запуска fade-out
             }
         }
     };
@@ -132,10 +134,9 @@ window.onload = function() {
             displayResponse(data);
             // Изменяем цвет квадратика на желтый при получении ответа
             statusIndicator.style.backgroundColor = 'yellow';
-            // Если есть распознанный текст, отменяем таймер для fade-out и сбрасываем флаг
+            // Если есть распознанный текст, отменяем таймер для fade-out
             if (resultDisplay.textContent) {
                 clearTimeout(fadeOutTimer);
-                isFadingOut = false;
             }
         })
         .catch(error => {
@@ -165,10 +166,7 @@ window.onload = function() {
     }
 
     function startFadeOutWithDelay() {
-        setTimeout(function() {
-            isFadingOut = true; // Устанавливаем флаг в true при запуске fade-out с задержкой
-            startFadeOut();
-        }, 500);
+        setTimeout(startFadeOut, 500); // Задержка перед запуском fade-out
     }
 
     // Функция для переключения видимости распознанного текста
