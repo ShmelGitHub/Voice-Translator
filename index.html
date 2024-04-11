@@ -14,11 +14,11 @@
     }
 
     #statusIndicator, #toggleButton {
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
+        width: 15px;
+        height: 15px;
+        border-radius:50%;
         position: fixed; /* Переключение на фиксированное позиционирование */
-        outline: 2px solid rgba(128, 128, 128, 0.5); /* Изменен цвет и прозрачность outline */
+        outline: 0px solid rgba(0, 0, 0, 0.5); /* Изменен цвет и прозрачность outline */
     }
 
     #statusIndicator {
@@ -30,8 +30,10 @@
     #toggleButton {
         background-color: gray; /* Изменен цвет фона кнопки на серый */
         top: 10px; /* Расположение в левом верхнем углу */
-        left: 40px; /* Отступ от маркера */
+        left: 30px; /* Отступ от маркера */
         cursor: pointer;
+	display: inline-block;
+
     }
 
     #response {
@@ -42,6 +44,8 @@
         display: flex; /* Использование flexbox для центрирования содержимого */
         justify-content: center; /* Выравнивание содержимого по центру по горизонтали */
         align-items: center; /* Выравнивание содержимого по центру по вертикали */
+ 	font-size: 24px;
+
     }
 
     #response.fade-in {
