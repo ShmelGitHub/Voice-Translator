@@ -101,6 +101,9 @@ window.onload = function() {
 
     recognition.onerror = function(event) {
         console.error('Speech recognition error:', event.error);
+        if (event.error === 'no-speech') { // Проверяем тип ошибки
+            startFadeOut(); // Запускаем fade-out только если тип ошибки no-speech
+        }
     };
 
     recognition.onend = function() {
