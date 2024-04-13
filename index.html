@@ -151,7 +151,7 @@ recognition.onerror = function(event) {
                 clearTimeout(fadeOutTimer);
             }
             displayResponse(data); // Показываем ответ после получения
-	responseElement.classList.add('fade-in'); // Добавляем класс для анимации исчезновения
+	    startFadeIn()
         })
         .catch(error => {
             console.error('Error fetching data:', error);
@@ -172,8 +172,13 @@ recognition.onerror = function(event) {
         }
     }, 100); // Задержка перед сменой текста в миллисекундах
 }
-
-
+function startFadeIn() {
+            responseElement.classList.add('fade-in'); // Добавляем класс для анимации исчезновения
+            setTimeout(function() {
+                responseElement.classList.remove('fade-in'); // Удаляем класс анимации исчезновения
+            }, 1000); // Длительность анимации исчезновения
+    }
+	
     function startFadeOut() {
         fadeOutTimer = setTimeout(function() {
             responseElement.classList.add('fade-out'); // Добавляем класс для анимации исчезновения
@@ -216,5 +221,5 @@ recognition.onerror = function(event) {
 <button id="toggleButton"></button>
 <p id="response" class="hidden"></p>
 <p><span id="speechResult"></span></p>
-<p style="position: fixed; bottom: 10px; left: 10px; font-size: 0.4em;font-family: Arial, sans-serif;">0.1.7</p> <!-- Текст с версией сайта -->
+<p style="position: fixed; bottom: 10px; left: 10px; font-size: 0.4em;font-family: Arial, sans-serif;">0.1.8</p> <!-- Текст с версией сайта -->
 </body>
