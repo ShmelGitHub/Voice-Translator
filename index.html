@@ -164,7 +164,7 @@ recognition.onerror = function(event) {
 
     function displayResponse(responseText) {
     setTimeout(function() {
-        responseElement.textContent = '-'+responseText;
+        responseElement.textContent = '- '+responseText;
         if (responseElement.classList.contains('hidden')) {
             responseElement.textContent = '⠀';
             responseElement.classList.remove('hidden');
@@ -221,5 +221,5 @@ function startFadeIn() {
 <button id="toggleButton"></button>
 <p id="response" class="hidden"></p>
 <p><span id="speechResult"></span></p>
-<p style="position: fixed; bottom: 10px; left: 10px; font-size: 0.4em;font-family: Arial, sans-serif;">0.1.9</p> <!-- Текст с версией сайта -->
+<p style="position: fixed; bottom: 10px; left: 10px; font-size: 0.4em;font-family: Arial, sans-serif;">0.2.0</p> <!-- Текст с версией сайта -->
 </body>
