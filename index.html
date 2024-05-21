@@ -131,7 +131,7 @@ window.onload = function() {
 
     function sendToServer(text) {
         var encodedText = encodeURIComponent(text);
-        var url = 'https://cors-anywhere-j2ux.onrender.com/https://adorable-windbreaker-crab.cyclic.app/gpt/' + encodedText;
+        var url = 'https://cors-anywhere-j2ux.onrender.com/https://twitch-translator.onrender.com/gpt/' + encodedText;
 
         statusIndicator.style.backgroundColor = 'orange';
 
@@ -203,21 +203,21 @@ window.onload = function() {
         }
     });
 
-    function detectLanguageAndSwitch() {
+    function detectLanguageAndSwitch(text) {
         var englishPattern = /[a-zA-Z]/;
-        var text = "";
-
         if (englishPattern.test(text)) {
             recognition.lang = 'en-US';
         } else {
             recognition.lang = 'ru-RU';
         }
-
-        recognition.start();
     }
 
-    // Проверяем язык перед началом распознавания
-    detectLanguageAndSwitch();
+    recognition.onstart = function() {
+        var speechResult = resultDisplay.textContent;
+        detectLanguageAndSwitch(speechResult);
+    };
+
+    recognition.start();
 };
 </script>
 </head>
