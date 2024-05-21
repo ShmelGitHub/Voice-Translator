@@ -6,9 +6,9 @@
 <title>Распознавание речи</title>
 <style>
     body {
-        background-color: green; /* Изменен цвет фона страницы на зеленый */
-        color: white; /* Изменен цвет текста на белый */
-        text-align: center; /* Отцентрирован текст по центру */
+        background-color: green;
+        color: white;
+        text-align: center;
         font-size: 2em;
         font-family: Arial, sans-serif;
     }
@@ -16,77 +16,76 @@
     #statusIndicator, #toggleButton {
         width: 15px;
         height: 15px;
-        border-radius:50%;
-        position: fixed; /* Переключение на фиксированное позиционирование */
-        outline: 0px solid rgba(0, 0, 0, 0.5); /* Изменен цвет и прозрачность outline */
+        border-radius: 50%;
+        position: fixed;
+        outline: 0px solid rgba(0, 0, 0, 0.5);
     }
 
     #statusIndicator {
         background-color: red;
-        top: 10px; /* Расположение в левом верхнем углу */
-        left: 10px; /* Расположение в левом верхнем углу */
+        top: 10px;
+        left: 10px;
     }
 
     #toggleButton {
-        background-color: gray; /* Изменен цвет фона кнопки на серый */
-        top: 10px; /* Расположение в левом верхнем углу */
-        left: 30px; /* Отступ от маркера */
+        background-color: gray;
+        top: 10px;
+        left: 30px;
         cursor: pointer;
-	display: inline-block;
-
+        display: inline-block;
     }
 
     #response {
-        color: white; /* Изменен цвет текста на белый */
-        margin-top: 100px; /* Добавлен отступ сверху */
-        line-height: 1em; /* Установлено значение высоты строки */
-        height: calc(100vh - 170px); /* Высота блока с отступами сверху и снизу */
-        display: flex; /* Использование flexbox для центрирования содержимого */
-        justify-content: center; /* Выравнивание содержимого по центру по горизонтали */
-        align-items: center; /* Выравнивание содержимого по центру по вертикали */
- 	font-size: 24px;
-
+        color: white;
+        margin-top: 100px;
+        line-height: 1em;
+        height: calc(100vh - 170px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 24px;
     }
 
     #response.fade-in {
-        animation: fadeIn 1s ease-out forwards; /* Анимация появления с задержкой 1 секунда и плавным исчезновением */
+        animation: fadeIn 1s ease-out forwards;
     }
 
     #response.fade-out {
-        animation: fadeOut 1s ease-out forwards; /* Анимация исчезновения с задержкой 1 секунда и плавным исчезнованием */
+        animation: fadeOut 1s ease-out forwards;
     }
 
     #response.hidden {
-        display: none; /* Скрываем текст при добавлении класса hidden */
+        display: none;
     }
 
     #speechResult {
-        font-size: 1em; /* Уменьшен размер текста в два раза */
-        display: none; /* Начально скрываем распознанный текст */
+        font-size: 1em;
+        display: none;
     }
 
     @keyframes fadeIn {
         from {
-            opacity: 0; /* Начальное значение прозрачности */
+            opacity: 0;
         }
         to {
-            opacity: 1; /* Конечное значение прозрачности */
+            opacity: 1;
         }
     }
 
     @keyframes fadeOut {
         from {
-            opacity: 1; /* Начальное значение прозрачности */
+            opacity: 1;
         }
         to {
-            opacity: 0; /* Конечное значение прозрачности */
+            opacity: 0;
         }
     }
 </style>
 <script>
 window.onload = function() {
     var recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition || window.mozSpeechRecognition || window.msSpeechRecognition)();
-    recognition.lang = 'ru-RU';
+    var defaultLang = 'ru-RU';
+    recognition.lang = defaultLang;
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
 
@@ -94,108 +93,98 @@ window.onload = function() {
     var statusIndicator = document.getElementById('statusIndicator');
     var toggleButton = document.getElementById('toggleButton');
     var responseElement = document.getElementById('response');
-    var fadeOutTimer; // Глобальная переменная для таймера анимации fade-out
-    var errorCount = 0; // Счетчик ошибок
+    var fadeOutTimer;
+    var errorCount = 0;
 
+    recognition.onresult = function(event) {
+        var speechResult = event.results[0][0].transcript;
+        resultDisplay.textContent = speechResult;
+        responseElement.classList.remove('hidden');
+        clearTimeout(fadeOutTimer);
+        errorCount = 0;
 
-   recognition.onresult = function(event) {
-    var speechResult = event.results[0][0].transcript;
-    resultDisplay.textContent = speechResult;
-    responseElement.classList.remove('hidden'); // Показываем распознанный текст
-    clearTimeout(fadeOutTimer); // Прерываем таймер при получении распознавания
-    errorCount = 0; // Сбрасываем счетчик ошибок при получении распознавания
-    sendToServer(speechResult); // Вызываем функцию sendToServer при каждом результате распознавания
-};
-
-recognition.onerror = function(event) {
-    console.error('Speech recognition error:', event.error);
-    if (event.error === 'no-speech' && statusIndicator.style.backgroundColor !== 'red') { // Проверяем тип ошибки и цвет кружка
-        errorCount++; // Увеличиваем счетчик ошибок только если кружок не красный
-        console.log('Error count:', errorCount); // Логируем количество ошибок
-        if (errorCount >= 3) { // Проверяем, достиг ли счетчик значения 3
-            statusIndicator.style.backgroundColor = 'red';
-            startFadeOutWithDelay(); // Запускаем fade-out с задержкой только если тип ошибки no-speech и счетчик ошибок достиг значения 3
-            errorCount = 0; // Сбрасываем счетчик ошибок после запуска fade-out
-            // Изменяем цвет кружка на красный
-            
-        }
-    }
-};
-
-
-
-
-    recognition.onend = function() {
-        if (!resultDisplay.textContent) { // Проверяем наличие текста в speechResult
-            startFadeOut(); // Запускаем fade-out только если speechResult пустой
-        }
-        recognition.start(); // После завершения распознавания начинаем его снова
+        sendToServer(speechResult);
+        recognition.lang = defaultLang; // Возвращаем язык на русский после отправки на сервер
     };
 
-    recognition.start(); // Начинаем распознавание при загрузке страницы
+    recognition.onerror = function(event) {
+        console.error('Speech recognition error:', event.error);
+        if (event.error === 'no-speech' && statusIndicator.style.backgroundColor !== 'red') {
+            errorCount++;
+            console.log('Error count:', errorCount);
+            if (errorCount >= 3) {
+                statusIndicator.style.backgroundColor = 'red';
+                startFadeOutWithDelay();
+                errorCount = 0;
+            }
+        }
+    };
+
+    recognition.onend = function() {
+        if (!resultDisplay.textContent) {
+            startFadeOut();
+        }
+        recognition.start();
+    };
+
+    recognition.start();
 
     function sendToServer(text) {
         var encodedText = encodeURIComponent(text);
         var url = 'https://cors-anywhere-j2ux.onrender.com/https://twitch-translator.onrender.com/gpt/' + encodedText;
-//https://cors-anywhere-j2ux.onrender.com/https://busy-lime-betta-suit.cyclic.app/gpt/
-//https://cors-anywhere-j2ux.onrender.com/https://adorable-windbreaker-crab.cyclic.app/gpt/
-        // Изменяем цвет квадратика на зеленый при отправке запроса
+
         statusIndicator.style.backgroundColor = 'orange';
 
         fetch(url)
         .then(response => response.text())
         .then(data => {
-            // Изменяем цвет квадратика на желтый при получении ответа
             statusIndicator.style.backgroundColor = 'yellow';
-            // Если есть распознанный текст, отменяем таймер для fade-out
             if (resultDisplay.textContent) {
                 clearTimeout(fadeOutTimer);
             }
-            displayResponse(data); // Показываем ответ после получения
-	    startFadeIn()
+            displayResponse(data);
+            startFadeIn();
         })
         .catch(error => {
             console.error('Error fetching data:', error);
-            // Изменяем цвет квадратика на красный при ошибке
             statusIndicator.style.backgroundColor = 'red';
-            // Запускаем fade-out с задержкой при ошибке
             startFadeOutWithDelay();
         });
     }
 
     function displayResponse(responseText) {
-    setTimeout(function() {
-        responseElement.textContent = '- '+responseText;
-        if (responseElement.classList.contains('hidden')) {
-            responseElement.textContent = '⠀';
-            responseElement.classList.remove('hidden');
-            responseElement.classList.add('fade-in');
-        }
-    }, 100); // Задержка перед сменой текста в миллисекундах
-}
-function startFadeIn() {
-            responseElement.classList.add('fade-in'); // Добавляем класс для анимации исчезновения
-            setTimeout(function() {
-                responseElement.classList.remove('fade-in'); // Удаляем класс анимации исчезновения
-            }, 1000); // Длительность анимации исчезновения
+        setTimeout(function() {
+            responseElement.textContent = '- ' + responseText;
+            if (responseElement.classList.contains('hidden')) {
+                responseElement.textContent = '⠀';
+                responseElement.classList.remove('hidden');
+                responseElement.classList.add('fade-in');
+            }
+        }, 100);
     }
-	
+
+    function startFadeIn() {
+        responseElement.classList.add('fade-in');
+        setTimeout(function() {
+            responseElement.classList.remove('fade-in');
+        }, 1000);
+    }
+
     function startFadeOut() {
         fadeOutTimer = setTimeout(function() {
-            responseElement.classList.add('fade-out'); // Добавляем класс для анимации исчезновения
+            responseElement.classList.add('fade-out');
             setTimeout(function() {
-                responseElement.classList.add('hidden'); // Добавляем класс для скрытия текста
+                responseElement.classList.add('hidden');
                 responseElement.textContent = '   ';
-                responseElement.classList.remove('fade-out'); // Удаляем класс анимации исчезновения
-            }, 1000); // Длительность анимации исчезновения
-        }, 5000); // Длительность задержки перед скрытием текста
+                responseElement.classList.remove('fade-out');
+            }, 1000);
+        }, 5000);
     }
 
     function startFadeOutWithDelay() {
-        setTimeout(startFadeOut, 500); // Задержка перед запуском fade-out
+        setTimeout(startFadeOut, 500);
     }
 
-    // Функция для переключения видимости распознанного текста
     toggleButton.onclick = function() {
         if (resultDisplay.style.display === 'none') {
             resultDisplay.style.display = 'inline';
@@ -204,16 +193,15 @@ function startFadeIn() {
         }
     };
 
-    // Удаление класса hidden после завершения анимации fade out
-   responseElement.addEventListener('animationend', function(event) {
-    if (event.animationName === 'fadeOut') {
-        setTimeout(function() {
-            responseElement.textContent = '   '; // Обнуляем содержимое элемента
-        }, 1000); // Добавляем небольшую задержку перед обнулением содержимого, чтобы дать время для завершения анимации
-        responseElement.classList.add('hidden'); // Добавляем класс для скрытия текста
-        responseElement.classList.remove('fade-out'); // Удаляем класс анимации исчезновения
-    }
-});
+    responseElement.addEventListener('animationend', function(event) {
+        if (event.animationName === 'fadeOut') {
+            setTimeout(function() {
+                responseElement.textContent = '   ';
+            }, 1000);
+            responseElement.classList.add('hidden');
+            responseElement.classList.remove('fade-out');
+        }
+    });
 };
 </script>
 </head>
@@ -222,5 +210,6 @@ function startFadeIn() {
 <button id="toggleButton"></button>
 <p id="response" class="hidden"></p>
 <p><span id="speechResult"></span></p>
-<p style="position: fixed; bottom: 10px; left: 10px; font-size: 0.4em;font-family: Arial, sans-serif;">0.2.1</p> <!-- Текст с версией сайта -->
+<p style="position: fixed; bottom: 10px; left: 10px; font-size: 0.4em;font-family: Arial, sans-serif;">0.2.2</p>
 </body>
+</html>
